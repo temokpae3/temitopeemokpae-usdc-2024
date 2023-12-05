@@ -27,6 +27,27 @@
         "Results": []
     };
     
+    // Loop through each book in the scanned text object
+    scannedTextObj.forEach((book) => {
+        // Loop through each content in the book
+        book.Content.forEach((content) => {
+            // if the search term exists in the text
+            if (content.Text.match(searchTerm)) {
+                // push the result to the results array
+                result.Results.push({
+                    // add the book details
+                    "ISBN": book.ISBN,
+                    "Page": content.Page,
+                    "Line": content.Line
+                });
+            }
+        });
+    });
+
+    // Set the search term in the result object
+    result.SearchTerm = searchTerm;
+
+    // Returns the search results object
     return result; 
 }
 
@@ -54,6 +75,9 @@ const twentyLeaguesIn = [
         ] 
     }
 ]
+
+/** Example input object for Empty input test */
+const twentyLeaguesIn2 = []
     
 /** Example output object */
 const twentyLeaguesOut = {
@@ -65,6 +89,24 @@ const twentyLeaguesOut = {
             "Line": 9
         }
     ]
+}
+
+/** Example output object for Case-sensitive test */
+const twentyLeaguesOut2 = {
+    "SearchTerm": "The",
+    "Results": [
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 8
+        }
+    ]
+}
+    
+/** Example output object for Empty input test */
+const twentyLeaguesOut3 = {
+    "SearchTerm": "",
+    "Results": []
 }
 
 /*
@@ -101,4 +143,34 @@ if (test2result.Results.length == 1) {
     console.log("FAIL: Test 2");
     console.log("Expected:", twentyLeaguesOut.Results.length);
     console.log("Received:", test2result.Results.length);
+}
+
+/** Negative test: we can test that we get no matches for a searched term that doesn't exist */
+const test3result = findSearchTermInBooks("stars", twentyLeaguesIn);
+if (test3result.Results.length === 0) {
+    console.log("PASS: Test 3");
+} else {
+    console.log("FAIL: Test 3");
+    console.log("Expected:", 0);
+    console.log("Received:", test3result.Results.length);
+}
+
+/** Case-sensitive test: we can test that there's a match on "The" and not "the" */
+const test4result = findSearchTermInBooks("The", twentyLeaguesIn);
+if (JSON.stringify(twentyLeaguesOut2) === JSON.stringify(test4result)) {
+    console.log("PASS: Test 4");
+} else {
+    console.log("FAIL: Test 4");
+    console.log("Expected:", twentyLeaguesOut2);
+    console.log("Received:", test4result);
+}
+
+/** Empty input test: we can test that an empty search term returns no matches */
+const test5result = findSearchTermInBooks("", twentyLeaguesIn2);
+if (JSON.stringify(twentyLeaguesOut3) === JSON.stringify(test5result)) {
+    console.log("PASS: Test 5");
+} else {
+    console.log("FAIL: Test 5");
+    console.log("Expected: Empty search term and no results");
+    console.log("Received:", JSON.stringify(test5result.SearchTerm));
 }
